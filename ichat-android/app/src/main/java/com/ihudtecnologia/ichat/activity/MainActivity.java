@@ -9,6 +9,8 @@ import android.widget.ListView;
 
 import com.ihudtecnologia.ichat.R;
 import com.ihudtecnologia.ichat.adapter.MensagemAdapter;
+import com.ihudtecnologia.ichat.callback.EnviarMensagemCallBack;
+import com.ihudtecnologia.ichat.callback.OuvirMensagensCallBack;
 import com.ihudtecnologia.ichat.modelo.Mensagem;
 import com.ihudtecnologia.ichat.service.ChatService;
 
@@ -16,6 +18,10 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,14 +47,21 @@ public class MainActivity extends AppCompatActivity {
 
         editText = (EditText) findViewById(R.id.et_texto);
 
-        chatService = new ChatService(MainActivity.this);
-        chatService.ouvirMensagens();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://192.168.43.167:8080/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        chatService = retrofit.create(ChatService.class);
+        Call<Mensagem> call = chatService.ouvirMensagens();
+        call.enqueue(new OuvirMensagensCallBack(this));
 
         button = (Button) findViewById(R.id.btnEnviar);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                chatService.enviar(new Mensagem(idDoCliente, editText.getText().toString()));
+                chatService.enviar(new Mensagem(idDoCliente, editText.getText().toString()))
+                        .enqueue(new EnviarMensagemCallBack());
             }
         });
 
@@ -61,7 +74,12 @@ public class MainActivity extends AppCompatActivity {
 
         listaDeMensagens.setAdapter(adapter);
 
-        chatService.ouvirMensagens();
+        ouvirMensagem();
 
+    }
+
+    public void ouvirMensagem(){
+        Call<Mensagem> call = chatService.ouvirMensagens();
+        call.enqueue(new OuvirMensagensCallBack(this));
     }
 }

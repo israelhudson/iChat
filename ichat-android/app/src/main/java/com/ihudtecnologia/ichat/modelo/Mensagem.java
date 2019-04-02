@@ -1,7 +1,10 @@
 package com.ihudtecnologia.ichat.modelo;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Mensagem {
 
+    @SerializedName("text")
     private String texto;
     private int id;
 
