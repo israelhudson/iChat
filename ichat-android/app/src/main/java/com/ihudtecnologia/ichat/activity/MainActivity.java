@@ -9,6 +9,7 @@ import android.widget.ListView;
 
 import com.ihudtecnologia.ichat.R;
 import com.ihudtecnologia.ichat.adapter.MensagemAdapter;
+import com.ihudtecnologia.ichat.app.ChatApplication;
 import com.ihudtecnologia.ichat.callback.EnviarMensagemCallBack;
 import com.ihudtecnologia.ichat.callback.OuvirMensagensCallBack;
 import com.ihudtecnologia.ichat.modelo.Mensagem;
@@ -47,12 +48,9 @@ public class MainActivity extends AppCompatActivity {
 
         editText = (EditText) findViewById(R.id.et_texto);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.43.167:8080/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+        ChatApplication app = (ChatApplication) getApplication();
+        this.chatService = app.getChatService();
 
-        chatService = retrofit.create(ChatService.class);
         Call<Mensagem> call = chatService.ouvirMensagens();
         call.enqueue(new OuvirMensagensCallBack(this));
 
