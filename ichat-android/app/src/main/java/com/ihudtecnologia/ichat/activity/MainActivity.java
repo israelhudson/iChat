@@ -7,22 +7,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.ihudtecnologia.ichat.app.ChatApplication;
 import com.ihudtecnologia.ichat.R;
 import com.ihudtecnologia.ichat.adapter.MensagemAdapter;
-import com.ihudtecnologia.ichat.app.ChatApplication;
 import com.ihudtecnologia.ichat.callback.EnviarMensagemCallBack;
 import com.ihudtecnologia.ichat.callback.OuvirMensagensCallBack;
+import com.ihudtecnologia.ichat.component.ChatComponent;
 import com.ihudtecnologia.ichat.modelo.Mensagem;
 import com.ihudtecnologia.ichat.service.ChatService;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import retrofit2.Call;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,12 +30,22 @@ public class MainActivity extends AppCompatActivity {
     private Button button;
     private ListView listaDeMensagens;
     private List<Mensagem> mensagens;
-    private ChatService chatService;
+
+    @Inject
+    ChatService chatService;
+
+    private ChatComponent component;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        component.inject(this);
+
+        ChatApplication app = (ChatApplication) getApplication();
+        component = app.getComponent();
+        component.inject(this);
 
         listaDeMensagens = (ListView) findViewById(R.id.lv_mensagens);
 
@@ -47,9 +56,6 @@ public class MainActivity extends AppCompatActivity {
         listaDeMensagens.setAdapter(adapter);
 
         editText = (EditText) findViewById(R.id.et_texto);
-
-        ChatApplication app = (ChatApplication) getApplication();
-        this.chatService = app.getChatService();
 
         Call<Mensagem> call = chatService.ouvirMensagens();
         call.enqueue(new OuvirMensagensCallBack(this));
