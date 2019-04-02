@@ -41,11 +41,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        component.inject(this);
-
         ChatApplication app = (ChatApplication) getApplication();
         component = app.getComponent();
-        component.inject(this);
+        component.inject(MainActivity.this);
 
         listaDeMensagens = (ListView) findViewById(R.id.lv_mensagens);
 

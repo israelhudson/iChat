@@ -9,6 +9,7 @@ public class ChatApplication extends Application {
 
     private ChatComponent component;
 
+    @Override
     public void onCreate() {
 
         component = DaggerChatComponent.builder().build();
