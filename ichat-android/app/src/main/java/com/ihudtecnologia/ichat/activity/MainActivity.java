@@ -21,14 +21,22 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit2.Call;
 
 public class MainActivity extends AppCompatActivity {
 
     private int idDoCliente = 1;
-    private EditText editText;
-    private Button button;
-    private ListView listaDeMensagens;
+
+    @BindView(R.id.et_texto)
+    EditText editText;
+    @BindView(R.id.btnEnviar)
+    Button button;
+    @BindView(R.id.lv_mensagens)
+    ListView listaDeMensagens;
+
     private List<Mensagem> mensagens;
 
     @Inject
@@ -41,11 +49,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ButterKnife.bind(this);
+
         ChatApplication app = (ChatApplication) getApplication();
         component = app.getComponent();
-        component.inject(MainActivity.this);
-
-        listaDeMensagens = (ListView) findViewById(R.id.lv_mensagens);
+        component.inject(this);
 
         mensagens = new ArrayList<>();
 
@@ -53,20 +61,15 @@ public class MainActivity extends AppCompatActivity {
 
         listaDeMensagens.setAdapter(adapter);
 
-        editText = (EditText) findViewById(R.id.et_texto);
-
         Call<Mensagem> call = chatService.ouvirMensagens();
         call.enqueue(new OuvirMensagensCallBack(this));
 
-        button = (Button) findViewById(R.id.btnEnviar);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                chatService.enviar(new Mensagem(idDoCliente, editText.getText().toString()))
-                        .enqueue(new EnviarMensagemCallBack());
-            }
-        });
+    }
 
+    @OnClick(R.id.btnEnviar)
+    public void enviarMensagem(){
+        chatService.enviar(new Mensagem(idDoCliente, editText.getText().toString()))
+                .enqueue(new EnviarMensagemCallBack());
     }
 
     public void colocaNaLista(Mensagem mensagem){
